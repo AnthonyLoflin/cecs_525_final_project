@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image upload test</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<style>
+    body{
+        font-family: ‘Segoe UI’;
+        font-size: 13pt;
+    }
+    header h1{
+        font-size:15pt;
+        color: #fff;
+        background-color: #1BA1E2;
+        padding: 20px;
+    }
+    #dataArea
+    {
+        width: 80%;
+        margin:auto;
+        margin-top:10px;
+    }
+    #dataArea input, #dataArea #submit{
+        line-height: 20pt;
+        font-size: 13pt;
+    }
+    .thumbnail{
+        height: 100px;
+        margin: 10px;
+        float: left;
+    }
+</style>
+<script>
+    window.onload = function(){
+       
+        //Check File API support
+        if(window.File && window.FileList && window.FileReader)
+        {
+            var filesInput = document.getElementById("files");
+            filesInput.addEventListener("change", function(event){
+                var files = event.target.files; //FileList object
+                var output = document.getElementById("result");
+                for(var i = 0; i< files.length; i++)
+                {
+                    var file = files[i];
+                    //Only pics
+                    if(!file.type.match('image'))
+                      continue;
+                    var picReader = new FileReader();
+                    picReader.addEventListener("load",function(event){                 
+                        var picFile = event.target;                       
+                        var div = document.createElement("div");                        
+                        div.innerHTML = "<img class='thumbnail' src='" + picFile.result + "'" +
+                                "title='" + picFile.name + "'/>";
+                        output.insertBefore(div,null);                      
+                    });
+                    
+                     //Read the image
+                    picReader.readAsDataURL(file);
+                }                                            
+            });
+        }
+        else
+        {
+            console.log("Your browser does not support File API");
+        }
+    }     
+</script>
+</head>
+<body>
+    <header>
+        <h1>Upload Image</h1>
+    </header>
+    <div style="margin-bottom: 20px; clear: both;">
+        <form id="basicForm">
+            <div id="dataArea">
+                <div style="margin-bottom: 20px;">
+                    <label for="name">Enter name: </label>
+                    <input id="txtName" name="txtName" placeholder="Enter name..." type="text" required/>
+                </div>
+                
+                <div>
+                    <label for="files">Upload Images: </label>
+                    <input id="files" name="file[]" type="file" multiple required/><br/>
+                    <button id="submit" type="submit">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <output id="result" />
+
+    <div id="msg"></div>
+<script>
+$(document).ready(function(){
+    $( "form" ).on( "submit", function( event ) {
+        event.preventDefault();
+	var formData = new FormData(this);
+        $.ajax({
+            type:"POST",
+            cache:false,
+            url: "/upload",
+	    data: formData,
+            success: function (html) {
+		console.log(response);
+                $('#add').val('data sent sent');
+                $('#msg').html(html);
+            },
+	    error: function(error) {
+		console.log(error)
+	    }
+        });
+    });
+});    
+</script>
+</body>
+</html>

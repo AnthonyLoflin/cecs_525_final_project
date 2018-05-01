@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image upload test</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<style>
+    body{
+        font-family: ‘Segoe UI’;
+        font-size: 13pt;
+    }
+    header h1{
+        font-size:15pt;
+        color: #fff;
+        background-color: #1BA1E2;
+        padding: 20px;
+    }
+    #dataArea
+    {
+        width: 80%;
+        margin:auto;
+        margin-top:10px;
+    }
+    #dataArea input, #dataArea #submit{
+        line-height: 20pt;
+        font-size: 13pt;
+    }
+    .thumbnail{
+        height: 100px;
+        margin: 10px;
+        float: left;
+    }
+</style>
+    
+</script>
+</head>
+<body>
+    <header>
+        <h1>Upload Image</h1>
+    </header>
+    <div style="margin-bottom: 20px; clear: both;">
+        <form id="basicForm" action="/upload" method="post" enctype="multipart/form-data">
+            <div id="dataArea">
+                <div style="margin-bottom: 20px;">
+                    <label for="name">Enter name: </label>
+                    <input id="txtName" name="subject_name" placeholder="Enter name..." type="text"/>
+                </div>
+                
+                <div>
+                    <label for="files">Upload Images: </label>
+                    <input name="file" type="file" multiple required/><br/>
+                    <button type="submit">Submit</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <output id="result" />
+
+    <div id="msg"></div>
+<script>
+document
+	.querySelector('#basicForm')
+	.addEventListener('submit', function processForm(event){
+		event.preventDefault();
+		console.log('processForm');
+
+		var form = event.currentTarget;
+		var multipleFiles = form.querySelector('input[type=file]');
+		var subject_name = form.querySelector('input[id=txtName]');
+
+		if (multipleFiles.files.length){
+		
+			var submit = form.querySelector('[type=submit]');
+			var request = new XMLHttpRequest();
+			var formData = Array.prototype.reduce.call(
+				multipleFiles.files,
+				function (formData, file, i) {
+					formData.append(multipleFiles.name + i, file);
+					return formData;
+				},
+				new FormData()
+			);
+			
+			formData.append(subject_name.name, subject_name.value);
+			
+			submit.disabled = true;
+			
+			request.open(form.method, form.action);
+			request.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+			console.log(Array.from(formData.entries()));
+			request.send(formData);
+
+			request.onLoad = function(e) {
+				console.log('Request Status', request.status);
+				submit.disabled = false;
+			};
+			
+			
+		}
+	}
+);    
+        
+</script>
+</body>
+</html>
